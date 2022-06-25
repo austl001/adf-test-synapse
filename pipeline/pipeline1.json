@@ -31,7 +31,7 @@
 							"referenceName": "AzureDataLakeStorage1",
 							"type": "LinkedServiceReference"
 						},
-						"folderPath": "fsaustl001"
+						"folderPath": "fsaustl001/dw-staging"
 					},
 					"compute": {
 						"coreCount": 8,
