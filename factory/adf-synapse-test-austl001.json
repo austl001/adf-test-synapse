@@ -1,0 +1,9 @@
+{
+	"name": "adf-synapse-test-austl001",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "76a3bb56-ef05-4d21-aa06-2b46aec6e35d",
+		"tenantId": "2a1c3628-3665-43e1-b7f4-39795edd51a4"
+	}
+}
