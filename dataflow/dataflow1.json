@@ -1,0 +1,103 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSynapseAnalyticsTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "window1"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Standard as string,",
+				"          {Trading.Party.ID} as string,",
+				"          {Trading Party Name} as string,",
+				"          {Trading Party Type} as string,",
+				"          Period as string,",
+				"          {Total number of tasks compeleted within Period} as integer,",
+				"          {Number of tasks completed on time} as short,",
+				"          {Number of tasks completed later than Time Parameter 1} as integer,",
+				"          {Number of tasks completed later than Time Parameter 2} as integer,",
+				"          {Number of tasks completed later than Time Parameter 3} as short,",
+				"          {Number of tasks completed later than Time Parameter 4} as short,",
+				"          {%Tasks Completed On Time} as double,",
+				"          {Time Parameter 1 Performance Charge Value} as integer,",
+				"          {Additional Time Parameter 2 Performance Charge Value} as integer,",
+				"          {Additional Time Parameter 3 Performance Charge Value} as integer,",
+				"          {Additional Time Parameter 4 Performance Charge Value} as integer,",
+				"          {Total Performance Charge Value} as integer,",
+				"          {Performance Charge Retailer credited value} as integer,",
+				"          {Performance Charge MO credited value} as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          Standard,",
+				"          TradingPartyID = {Trading.Party.ID},",
+				"          TradingPartyName = {Trading Party Name},",
+				"          TradingPartyType = {Trading Party Type},",
+				"          Period,",
+				"          TotalTasksCompeleted = {Total number of tasks compeleted within Period},",
+				"          TasksCompletedOnTime = {Number of tasks completed on time},",
+				"          PercentCompletedOnTime = {%Tasks Completed On Time}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 filter(TotalTasksCompeleted>3) ~> filter1",
+				"filter1 derive(Year = toInteger(left(Period, 4))) ~> derivedColumn1",
+				"derivedColumn1 window(over(Standard,",
+				"          Period,",
+				"          TradingPartyName),",
+				"     desc(PercentCompletedOnTime, true),",
+				"     asc(TradingPartyName, true),",
+				"     {Percent Tasks Completed On Time} = rank()) ~> window1",
+				"window1 alterRow(upsertIf(true())) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['Standard','TradingPartyID','Period'],",
+				"     format: 'table',",
+				"     staged: true,",
+				"     allowCopyCommand: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,100 @@
+{
+	"name": "DelimitedText1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "MPS_data.csv",
+				"container": "adf-test-source"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Standard",
+				"type": "String"
+			},
+			{
+				"name": "Trading.Party.ID",
+				"type": "String"
+			},
+			{
+				"name": "Trading Party Name",
+				"type": "String"
+			},
+			{
+				"name": "Trading Party Type",
+				"type": "String"
+			},
+			{
+				"name": "Period",
+				"type": "String"
+			},
+			{
+				"name": "Total number of tasks compeleted within Period",
+				"type": "String"
+			},
+			{
+				"name": "Number of tasks completed on time",
+				"type": "String"
+			},
+			{
+				"name": "Number of tasks completed later than Time Parameter 1",
+				"type": "String"
+			},
+			{
+				"name": "Number of tasks completed later than Time Parameter 2",
+				"type": "String"
+			},
+			{
+				"name": "Number of tasks completed later than Time Parameter 3",
+				"type": "String"
+			},
+			{
+				"name": "Number of tasks completed later than Time Parameter 4",
+				"type": "String"
+			},
+			{
+				"name": "%Tasks Completed On Time",
+				"type": "String"
+			},
+			{
+				"name": "Time Parameter 1 Performance Charge Value",
+				"type": "String"
+			},
+			{
+				"name": "Additional Time Parameter 2 Performance Charge Value",
+				"type": "String"
+			},
+			{
+				"name": "Additional Time Parameter 3 Performance Charge Value",
+				"type": "String"
+			},
+			{
+				"name": "Additional Time Parameter 4 Performance Charge Value",
+				"type": "String"
+			},
+			{
+				"name": "Total Performance Charge Value",
+				"type": "String"
+			},
+			{
+				"name": "Performance Charge Retailer credited value",
+				"type": "String"
+			},
+			{
+				"name": "Performance Charge MO credited value",
+				"type": "String"
+			}
+		]
+	}
+}
