@@ -7,7 +7,48 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlDWTable",
-		"schema": [],
+		"schema": [
+			{
+				"name": "Standard",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TradingPartyID",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TradingPartyName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TradingPartyType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Period",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TotalTasksCompeleted",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TasksCompletedOnTime",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "PercentCompletedOnTime",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Year",
+				"type": "int",
+				"precision": 10
+			}
+		],
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "MPS"

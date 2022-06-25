@@ -87,7 +87,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "DelimitedText1",
+						"referenceName": "mps_blob_test",
 						"type": "DatasetReference"
 					}
 				],

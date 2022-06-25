@@ -1,5 +1,5 @@
 {
-	"name": "DelimitedText1",
+	"name": "mps_blob_test",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureBlobStorage1",

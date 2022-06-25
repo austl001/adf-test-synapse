@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "DelimitedText1",
+						"referenceName": "mps_blob_test",
 						"type": "DatasetReference"
 					},
 					"name": "source1"
@@ -84,6 +84,17 @@
 				"window1 alterRow(upsertIf(true())) ~> alterRow1",
 				"alterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: true,",
+				"     input(",
+				"          Standard as string,",
+				"          TradingPartyID as string,",
+				"          TradingPartyName as string,",
+				"          TradingPartyType as string,",
+				"          Period as string,",
+				"          TotalTasksCompeleted as integer,",
+				"          TasksCompletedOnTime as integer,",
+				"          PercentCompletedOnTime as integer,",
+				"          Year as integer",
+				"     ),",
 				"     deletable:false,",
 				"     insertable:false,",
 				"     updateable:false,",
