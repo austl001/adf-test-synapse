@@ -1608,14 +1608,15 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": null,
+					"query": "    /*  Column-level security feature in Azure Synapse simplifies the design and coding of security in application.\n        It ensures column level security by restricting column access to protect sensitive data. */\n\n    /* Scenario: In this scenario we will be working with two users. The first one is the CEO, he has access to all\n        data. The second one is DataAnalystMiami, this user doesn't have access to the confidential Revenue column\n        in the Sales table. Follow this lab, one step at a time to see how Column-level security removes access to the\n        Revenue column to DataAnalystMiami */\n\n    --Step 1: Let us see how this feature in Azure Synapse works. Before that let us have a look at the Campaign table.\n    select  Top 100 * from wwi_Security.Sale\n    where City is not null and state is not null\n\n    /*  Consider a scenario where there are two users.\n        A CEO, who is an authorized  personnel with access to all the information in the database\n        and a Data Analyst, to whom only required information should be presented.*/\n\n    -- Step:2 Verify the existence of the 'CEO' and 'DataAnalystMiami' users in the Datawarehouse.\n    SELECT Name as [User1] FROM sys.sysusers WHERE name = N'CEO';\n    SELECT Name as [User2] FROM sys.sysusers WHERE name = N'DataAnalystMiami';\n\n\n    -- Step:3 Now let us enforce column level security for the DataAnalystMiami.\n    /*  The Sales table in the warehouse has information like ProductID, Analyst, Product, CampaignName, Quantity, Region, State, City, RevenueTarget and Revenue.\n        The Revenue generated from every campaign is classified and should be hidden from DataAnalystMiami.\n    */\n\n    REVOKE SELECT ON wwi_security.Sale FROM DataAnalystMiami;\n    GRANT SELECT ON wwi_security.Sale([ProductID], [Analyst], [Product], [CampaignName],[Quantity], [Region], [State], [City], [RevenueTarget]) TO DataAnalystMiami;\n    -- This provides DataAnalystMiami access to all the columns of the Sale table but Revenue.\n\n    -- Step:4 Then, to check if the security has been enforced, we execute the following query with current User As 'DataAnalystMiami', this will result in an error\n    --  since DataAnalystMiami doesn't have select access to the Revenue column\n    EXECUTE AS USER ='DataAnalystMiami';\n    select TOP 100 * from wwi_security.Sale;\n    ---\n    -- The following query will succeed since we are not including the Revenue column in the query.\n    EXECUTE AS USER ='DataAnalystMiami';\n    select [ProductID], [Analyst], [Product], [CampaignName],[Quantity], [Region], [State], [City], [RevenueTarget] from wwi_security.Sale;\n    \n    -- Step:5 Whereas, the CEO of the company should be authorized with all the information present in the warehouse.To do so, we execute the following query.\n    Revert;\n    GRANT SELECT ON wwi_security.Sale TO CEO;  --Full access to all columns.\n\n    -- Step:6 Let us check if our CEO user can see all the information that is present. Assign Current User As 'CEO' and the execute the query\n    EXECUTE AS USER ='CEO'\n    select * from wwi_security.Sale\n    Revert;",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"name": "SQLPool01",
-						"type": "SqlPool"
-					}
+						"databaseName": "SQLPool01",
+						"poolName": "SQLPool01"
+					},
+					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
 			},
@@ -1627,14 +1628,15 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": null,
+					"query": "SELECT\n    FS.CustomerID\n    ,MIN(FS.Quantity) as MinQuantity\n    ,MAX(FS.Quantity) as MaxQuantity\n    ,AVG(FS.Price) as AvgPrice\n    ,AVG(FS.TotalAmount) as AvgTotalAmount\n    ,AVG(FS.ProfitAmount) as AvgProfitAmount\n    ,COUNT(DISTINCT FS.StoreId) as DistinctStores\nFROM\n    wwi_perf.Sale_Heap FS\nGROUP BY\n    FS.CustomerId",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"name": "SQLPool01",
-						"type": "SqlPool"
-					}
+						"databaseName": "SQLPool01",
+						"poolName": "SQLPool01"
+					},
+					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
 			},
@@ -1646,14 +1648,15 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": null,
+					"query": "    -------------------------------------------------------------------------Dynamic Data Masking (DDM)----------------------------------------------------------------------------------------------------------\n    /*  Dynamic data masking helps prevent unauthorized access to sensitive data by enabling customers\n        to designate how much of the sensitive data to reveal with minimal impact on the application layer.\n        Let see how */\n\n    /* Scenario: WWI has identified sensitive information in the CustomerInfo table. They would like us to \n        obfuscate the CreditCard and Email columns of the CustomerInfo table to DataAnalysts */\n\n    -- Step:1 Let us first get a view of CustomerInfo table.\n    SELECT TOP (100) * FROM wwi_security.CustomerInfo;\n\n    -- Step:2 Let's confirm that there are no Dynamic Data Masking (DDM) applied on columns.\n    SELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \n    FROM sys.masked_columns AS c  \n    JOIN sys.tables AS tbl\n        ON c.[object_id] = tbl.[object_id]  \n    WHERE is_masked = 1\n        AND tbl.name = 'CustomerInfo';\n    -- No results returned verify that no data masking has been done yet.\n\n    -- Step:3 Now lets mask 'CreditCard' and 'Email' Column of 'CustomerInfo' table.\n    ALTER TABLE wwi_security.CustomerInfo  \n    ALTER COLUMN [CreditCard] ADD MASKED WITH (FUNCTION = 'partial(0,\"XXXX-XXXX-XXXX-\",4)');\n    GO\n    ALTER TABLE wwi_security.CustomerInfo\n    ALTER COLUMN Email ADD MASKED WITH (FUNCTION = 'email()');\n    GO\n    -- The columns are sucessfully masked.\n\n    -- Step:4 Let's see Dynamic Data Masking (DDM) applied on the two columns.\n    SELECT c.name, tbl.name as table_name, c.is_masked, c.masking_function  \n    FROM sys.masked_columns AS c  \n    JOIN sys.tables AS tbl\n        ON c.[object_id] = tbl.[object_id]  \n    WHERE is_masked = 1\n        AND tbl.name ='CustomerInfo';\n\n    -- Step:5 Now, let us grant SELECT permission to 'DataAnalystMiami' on the 'CustomerInfo' table.\n   GRANT SELECT ON wwi_security.CustomerInfo TO DataAnalystMiami;  \n\n    -- Step:6 Logged in as  'DataAnalystMiami' let us execute the select query and view the result.\n    EXECUTE AS USER = 'DataAnalystMiami';  \n    SELECT * FROM wwi_security.CustomerInfo;\n\n    -- Step:7 Let us remove the data masking using UNMASK permission\n    GRANT UNMASK TO DataAnalystMiami;\n    EXECUTE AS USER = 'DataAnalystMiami';  \n    SELECT *\n    FROM wwi_security.CustomerInfo;\n    revert;\n    REVOKE UNMASK TO DataAnalystMiami;  \n\n    ----step:8 Reverting all the changes back to as it was.\n    ALTER TABLE wwi_security.CustomerInfo\n    ALTER COLUMN CreditCard DROP MASKED;\n    GO\n    ALTER TABLE wwi_security.CustomerInfo\n    ALTER COLUMN Email DROP MASKED;\n    GO",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"name": "SQLPool01",
-						"type": "SqlPool"
-					}
+						"databaseName": "SQLPool01",
+						"poolName": "SQLPool01"
+					},
+					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
 			},
@@ -1665,14 +1668,15 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": null,
+					"query": "/*\tRow level Security (RLS) in Azure Synapse enables us to use group membership to control access to rows in a table.\n\tAzure Synapse applies the access restriction every time the data access is attempted from any user. \n\tLet see how we can implement row level security in Azure Synapse.*/\n\n----------------------------------Row-Level Security (RLS), 1: Filter predicates------------------------------------------------------------------\n-- Step:1 The Sale table has two Analyst values: DataAnalystMiami and DataAnalystSanDiego. \n--     Each analyst has jurisdiction across a specific Region. DataAnalystMiami on the South East Region\n--      and DataAnalystSanDiego on the Far West region.\nSELECT DISTINCT Analyst, Region FROM wwi_security.Sale order by Analyst ;\n\n/* Scenario: WWI requires that an Analyst only see the data for their own data from their own region. The CEO should see ALL data.\n    In the Sale table, there is an Analyst column that we can use to filter data to a specific Analyst value. */\n\n/* We will define this filter using what is called a Security Predicate. This is an inline table-valued function that allows\n    us to evaluate additional logic, in this case determining if the Analyst executing the query is the same as the Analyst\n    specified in the Analyst column in the row. The function returns 1 (will return the row) when a row in the Analyst column is the same as the \n    user executing the query (@Analyst = USER_NAME()) or if the user executing the query is the CEO user (USER_NAME() = 'CEO')\n    whom has access to all data.\n*/\n\n-- Review any existing security predicates in the database\nSELECT * FROM sys.security_predicates\n\n--Step:2 Create a new Schema to hold the security predicate, then define the predicate function. It returns 1 (or True) when\n--  a row should be returned in the parent query.\nGO\n\nCREATE FUNCTION wwi_security.fn_securitypredicate(@Analyst AS sysname)  \n    RETURNS TABLE  \nWITH SCHEMABINDING  \nAS  \n    RETURN SELECT 1 AS fn_securitypredicate_result\n    WHERE @Analyst = USER_NAME() OR USER_NAME() = 'CEO'\nGO\n-- Now we define security policy that adds the filter predicate to the Sale table. This will filter rows based on their login name.\nCREATE SECURITY POLICY SalesFilter  \nADD FILTER PREDICATE wwi_security.fn_securitypredicate(Analyst)\nON wwi_security.Sale\nWITH (STATE = ON);\n\n------ Allow SELECT permissions to the Sale Table.------\nGRANT SELECT ON wwi_security.Sale TO CEO, DataAnalystMiami, DataAnalystSanDiego;\n\n-- Step:3 Let us now test the filtering predicate, by selecting data from the Sale table as 'DataAnalystMiami' user.\nEXECUTE AS USER = 'DataAnalystMiami' \nSELECT * FROM wwi_security.Sale;\nrevert;\n-- As we can see, the query has returned rows here Login name is DataAnalystMiami\n\n-- Step:4 Let us test the same for  'DataAnalystSanDiego' user.\nEXECUTE AS USER = 'DataAnalystSanDiego';\nSELECT * FROM wwi_security.Sale;\nrevert;\n-- RLS is working indeed.\n\n-- Step:5 The CEO should be able to see all rows in the table.\nEXECUTE AS USER = 'CEO';  \nSELECT * FROM wwi_security.Sale;\nrevert;\n-- And he can.\n\n--Step:6 To disable the security policy we just created above, we execute the following.\nALTER SECURITY POLICY SalesFilter  \nWITH (STATE = OFF);\n\nDROP SECURITY POLICY SalesFilter;\nDROP FUNCTION wwi_security.fn_securitypredicate;",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"name": "SQLPool01",
-						"type": "SqlPool"
-					}
+						"databaseName": "SQLPool01",
+						"poolName": "SQLPool01"
+					},
+					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
 			},
