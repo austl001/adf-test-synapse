@@ -11,6 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics1'"
 		},
+		"asacosmosdb01_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'asacosmosdb01'"
+		},
 		"asaworkspacexhwrzef-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'asaworkspacexhwrzef-WorkspaceDefaultSqlServer'"
@@ -22,10 +26,6 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://asakeyvaultxhwrzef.vault.azure.net/"
-		},
-		"asacosmosdb01_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "asacosmosdb01"
 		},
 		"asaworkspacexhwrzef-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
@@ -1027,14 +1027,7 @@
 				"annotations": [],
 				"type": "CosmosDb",
 				"typeProperties": {
-					"connectionString": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyVault1",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "[parameters('asacosmosdb01_properties_typeProperties_connectionString_secretName')]"
-					}
+					"connectionString": "[parameters('asacosmosdb01_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -1042,8 +1035,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('workspaceId'), '/linkedServices/AzureKeyVault1')]"
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -2187,7 +2179,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "3fd69b86-8117-47d0-8ac3-9a9e4ff2854a"
+						"spark.autotune.trackingId": "87a8b236-51d2-4234-8108-ef7f45c6186b"
 					}
 				},
 				"metadata": {
@@ -2212,7 +2204,8 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2235,7 +2228,7 @@
 							"display(df.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
