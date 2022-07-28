@@ -1654,6 +1654,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/OnlineUserProfile01')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "USE master\nGO\n\nIF DB_ID (N'Profiles') IS NULL\nBEGIN\n    CREATE DATABASE Profiles;\nEND\nGO\n\nUSE Profiles\nGO\n\nDROP VIEW IF EXISTS OnlineUserProfile01;\nGO\n\nCREATE VIEW OnlineUserProfile01\nAS\nSELECT\n    *\nFROM OPENROWSET(\n    'CosmosDB',\n    N'account=asacosmosdbxhwrzef;database=CustomerProfile;key=Uiwg8TPIQduReoXAGfOttWCGFuQqlOz3n4c2dqcYqUDBXTl3pLTkA0AhB1sm8SOSlbuDCG8dVA6f3lDW1ekQ5Q==',\n    OnlineUserProfile01\n)\nWITH (\n    userId bigint,\n    cartId varchar(50),\n    preferredProducts varchar(max),\n    productReviews varchar(max)\n) AS profiles\nCROSS APPLY OPENJSON (productReviews)\nWITH (\n    productId bigint,\n    reviewText varchar(1000)\n) AS reviews\nGO\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "Profiles",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Row Level Security')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -2159,7 +2179,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "d32a08c8-3333-4c95-b216-1ef389233978"
+						"spark.autotune.trackingId": "3fd69b86-8117-47d0-8ac3-9a9e4ff2854a"
 					}
 				},
 				"metadata": {
@@ -2184,8 +2204,7 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
