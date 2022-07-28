@@ -11,10 +11,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics1'"
 		},
-		"asacosmosdb01_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'asacosmosdb01'"
-		},
 		"asaworkspacexhwrzef-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'asaworkspacexhwrzef-WorkspaceDefaultSqlServer'"
@@ -26,6 +22,10 @@
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://asakeyvaultxhwrzef.vault.azure.net/"
+		},
+		"asacosmosdb01_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "asacosmosdb01"
 		},
 		"asaworkspacexhwrzef-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
@@ -1027,7 +1027,14 @@
 				"annotations": [],
 				"type": "CosmosDb",
 				"typeProperties": {
-					"connectionString": "[parameters('asacosmosdb01_connectionString')]"
+					"connectionString": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyVault1",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "[parameters('asacosmosdb01_properties_typeProperties_connectionString_secretName')]"
+					}
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -1035,7 +1042,8 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('workspaceId'), '/linkedServices/AzureKeyVault1')]"
 			]
 		},
 		{

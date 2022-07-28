@@ -8,9 +8,6 @@
 		"AzureSynapseAnalytics1_connectionString": {
 			"value": ""
 		},
-		"asacosmosdb01_connectionString": {
-			"value": ""
-		},
 		"asaworkspacexhwrzef-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
@@ -19,6 +16,9 @@
 		},
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://asakeyvaultxhwrzef.vault.azure.net/"
+		},
+		"asacosmosdb01_properties_typeProperties_connectionString_secretName": {
+			"value": "asacosmosdb01"
 		},
 		"asaworkspacexhwrzef-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://asadatalakexhwrzef.dfs.core.windows.net"
