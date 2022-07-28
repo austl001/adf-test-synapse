@@ -22,6 +22,9 @@
 		},
 		"asaworkspacexhwrzef-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://asadatalakexhwrzef.dfs.core.windows.net"
+		},
+		"CosmosDb1_properties_typeProperties_connectionString_secretName": {
+			"value": "asacosmosdb01"
 		}
 	}
 }
