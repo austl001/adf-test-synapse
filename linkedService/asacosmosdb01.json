@@ -4,7 +4,8 @@
 		"annotations": [],
 		"type": "CosmosDb",
 		"typeProperties": {
-			"connectionString": {
+			"connectionString": "AccountEndpoint=https://asacosmosdbxhwrzef.documents.azure.com:443/;Database=CustomerProfile",
+			"accountKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "AzureKeyVault1",
