@@ -2187,7 +2187,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "44e3cbac-7bbd-4944-9865-31b127144f5b"
+						"spark.autotune.trackingId": "b16c151b-12d9-4c77-9fa5-d0c090b282b3"
 					}
 				},
 				"metadata": {
@@ -2212,7 +2212,8 @@
 						"sparkVersion": "2.4",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -2229,13 +2230,14 @@
 							"df = spark.read\\\n",
 							"    .format(\"cosmos.olap\")\\\n",
 							"    .option(\"spark.synapse.linkedService\", \"asacosmosdb01\")\\\n",
+							"    .option(\"spark.cosmos.database\", \"CustomerProfile\")\\\n",
 							"    .option(\"spark.cosmos.container\", \"OnlineUserProfile01\")\\\n",
 							"    .load()\n",
 							"\n",
 							"display(df.limit(10))"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 2
 					},
 					{
 						"cell_type": "code",
