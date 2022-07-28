@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "44e3cbac-7bbd-4944-9865-31b127144f5b"
+				"spark.autotune.trackingId": "2ec038c0-0fd4-457d-b914-2d703e1931c7"
 			}
 		},
 		"metadata": {
@@ -60,12 +60,13 @@
 					"df = spark.read\\\n",
 					"    .format(\"cosmos.olap\")\\\n",
 					"    .option(\"spark.synapse.linkedService\", \"asacosmosdb01\")\\\n",
+					"    .option(\"spark.cosmos.database\", \"CustomerProfile\")\\\n",
 					"    .option(\"spark.cosmos.container\", \"OnlineUserProfile01\")\\\n",
 					"    .load()\n",
 					"\n",
 					"display(df.limit(10))"
 				],
-				"execution_count": 1
+				"execution_count": 2
 			},
 			{
 				"cell_type": "code",
