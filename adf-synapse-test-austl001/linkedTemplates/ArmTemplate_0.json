@@ -89,7 +89,217 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "Standard",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TradingPartyID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TradingPartyName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TradingPartyType",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Period",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TotalTasksCompeleted",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TasksCompletedOnTime",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "PercentCompletedOnTime",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Year",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "MPS"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_dl_online_sale_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "webstore/raw/onlinesales",
+						"fileSystem": "webdevelopment"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_online_sales_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DS_online_sales",
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "webstore"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "onlinesales.json",
+						"container": "sales"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"SalesOrderNumber": {
+							"type": "string"
+						},
+						"SalesOrderLineNumber": {
+							"type": "integer"
+						},
+						"RevisionNumber": {
+							"type": "integer"
+						},
+						"OrderQuantity": {
+							"type": "integer"
+						},
+						"ProductCode": {
+							"type": "string"
+						},
+						"PromotionsCode": {
+							"type": "integer"
+						},
+						"CurrencyCode": {
+							"type": "string"
+						},
+						"UnitPrice": {
+							"type": "number"
+						},
+						"ExtendedAmount": {
+							"type": "number"
+						},
+						"UnitPriceDiscountPct": {
+							"type": "number"
+						},
+						"DiscountAmount": {
+							"type": "number"
+						},
+						"ProductStandardCost": {
+							"type": "number"
+						},
+						"TotalProductCost": {
+							"type": "number"
+						},
+						"SalesAmount": {
+							"type": "number"
+						},
+						"TaxAmt": {
+							"type": "number"
+						},
+						"Freight": {
+							"type": "number"
+						},
+						"CustomerCode": {
+							"type": "string"
+						},
+						"Region": {
+							"type": "string"
+						},
+						"Country": {
+							"type": "string"
+						},
+						"OrderDate": {
+							"type": "string"
+						},
+						"DueDate": {
+							"type": "string"
+						},
+						"ShipDate": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText2ADLS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "fsaustl001"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/mps_blob_test')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -194,63 +404,73 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DelimitedText2ADLS')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/PL_ingest_ws_sales_to_datalake')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileSystem": "fsaustl001"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"quoteChar": "\""
-				},
-				"schema": [
+				"description": "Ingest Web Store Online Sales Data into the Data Lake",
+				"activities": [
 					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
-					},
-					{
-						"type": "String"
+						"name": "Copy Online Web Store Sales Data",
+						"description": "Copy Online Sales Data from blob Web Store and ingest to Data Lake",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_online_sales_json",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_dl_online_sale_json",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSynapseAnalytics2",
-					"type": "LinkedServiceReference"
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
 				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "MPS"
-				}
+				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics2')]"
+				"[concat(variables('factoryId'), '/datasets/DS_online_sales_json')]",
+				"[concat(variables('factoryId'), '/datasets/DS_dl_online_sale_json')]"
 			]
 		},
 		{
@@ -263,7 +483,7 @@
 					"sources": [
 						{
 							"dataset": {
-								"referenceName": "DelimitedText1",
+								"referenceName": "mps_blob_test",
 								"type": "DatasetReference"
 							},
 							"name": "source1"
@@ -341,6 +561,17 @@
 						"window1 alterRow(upsertIf(true())) ~> alterRow1",
 						"alterRow1 sink(allowSchemaDrift: true,",
 						"     validateSchema: true,",
+						"     input(",
+						"          Standard as string,",
+						"          TradingPartyID as string,",
+						"          TradingPartyName as string,",
+						"          TradingPartyType as string,",
+						"          Period as string,",
+						"          TotalTasksCompeleted as integer,",
+						"          TasksCompletedOnTime as integer,",
+						"          PercentCompletedOnTime as integer,",
+						"          Year as integer",
+						"     ),",
 						"     deletable:false,",
 						"     insertable:false,",
 						"     updateable:false,",
@@ -356,8 +587,33 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]",
+				"[concat(variables('factoryId'), '/datasets/mps_blob_test')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/powerquery1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "WranglingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"name": "DelimitedText1",
+							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DelimitedText1",
+							"dataset": {
+								"referenceName": "mps_blob_test",
+								"type": "DatasetReference"
+							}
+						}
+					],
+					"script": "section Section1;\r\nshared DelimitedText1 = let AdfDoc = AzureStorage.BlobContents(\"https://synapseteststorageadf.blob.core.windows.net/adf-test-source/MPS_data.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared UserQuery = let Source = #\"DelimitedText1\",\r\n  #\"Changed column type\" = Table.TransformColumnTypes(Source, {{\"%Tasks Completed On Time\", type number}}),\r\n  #\"Removed columns\" = Table.RemoveColumns(#\"Changed column type\", {\"Time Parameter 1 Performance Charge Value\", \"Additional Time Parameter 2 Performance Charge Value\", \"Additional Time Parameter 3 Performance Charge Value\", \"Additional Time Parameter 4 Performance Charge Value\", \"Total Performance Charge Value\", \"Performance Charge Retailer credited value\", \"Performance Charge MO credited value\", \"Number of tasks completed later than Time Parameter 2\", \"Number of tasks completed later than Time Parameter 3\", \"Number of tasks completed later than Time Parameter 4\", \"Number of tasks completed later than Time Parameter 1\"}),\r\n  #\"Changed column type 1\" = Table.TransformColumnTypes(#\"Removed columns\", {{\"Total number of tasks compeleted within Period\", Int64.Type}, {\"Number of tasks completed on time\", Int64.Type}}) in #\"Changed column type 1\";\r\n",
+					"documentLocale": "en-us"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/mps_blob_test')]"
 			]
 		},
 		{
@@ -456,7 +712,7 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "DelimitedText1",
+								"referenceName": "mps_blob_test",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -479,7 +735,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/dataflow1')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]",
-				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]",
+				"[concat(variables('factoryId'), '/datasets/mps_blob_test')]",
 				"[concat(variables('factoryId'), '/datasets/DelimitedText2ADLS')]"
 			]
 		}
