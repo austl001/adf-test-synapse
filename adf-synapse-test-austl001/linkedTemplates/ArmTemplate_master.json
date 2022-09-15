@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics2'"
 		},
+		"LS_abls_buyalot_webstore_synapseteststorageadf_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_abls_buyalot_webstore_synapseteststorageadf'"
+		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakeaustl001.dfs.core.windows.net/"
@@ -65,6 +69,9 @@
 					},
 					"AzureSynapseAnalytics2_connectionString": {
 						"value": "[parameters('AzureSynapseAnalytics2_connectionString')]"
+					},
+					"LS_abls_buyalot_webstore_synapseteststorageadf_connectionString": {
+						"value": "[parameters('LS_abls_buyalot_webstore_synapseteststorageadf_connectionString')]"
 					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"

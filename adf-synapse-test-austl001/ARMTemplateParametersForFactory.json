@@ -17,6 +17,9 @@
 		"AzureSynapseAnalytics2_connectionString": {
 			"value": ""
 		},
+		"LS_abls_buyalot_webstore_synapseteststorageadf_connectionString": {
+			"value": ""
+		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://datalakeaustl001.dfs.core.windows.net/"
 		}
