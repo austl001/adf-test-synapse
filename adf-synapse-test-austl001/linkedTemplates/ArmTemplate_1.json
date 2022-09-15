@@ -429,7 +429,7 @@
 									"type": "Expression"
 								},
 								"pipelineTriggerTime": {
-									"value": "@pipeline().TriggerTime",
+									"value": "@convertFromUtc(pipeline().TriggerTime, 'GMT Standard Time')",
 									"type": "Expression"
 								},
 								"pipelineID": {
@@ -487,7 +487,7 @@
 									"type": "Expression"
 								},
 								"pipelineTriggerTime": {
-									"value": "@pipeline().TriggerTime",
+									"value": "@convertFromUtc(pipeline().TriggerTime, 'GMT Standard Time')",
 									"type": "Expression"
 								},
 								"pipelineID": {
