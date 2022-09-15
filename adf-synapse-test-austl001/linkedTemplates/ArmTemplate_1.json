@@ -1199,9 +1199,10 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Get Source To Target Details').output.values",
+								"value": "@activity('Get Source To Target Details').output.value",
 								"type": "Expression"
 							},
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "Copy Online Web Store Sales Data",
