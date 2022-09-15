@@ -1,0 +1,112 @@
+{
+	"name": "PL_util_send_email_notification",
+	"properties": {
+		"description": "This is a utility pipeline that sends email notifications",
+		"activities": [
+			{
+				"name": "Get Email Addresses",
+				"description": "Gets the Email Recipients for a specific system code and dataset name",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[GetEmailAddresses]",
+						"storedProcedureParameters": {
+							"DatasetName": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.datasetName",
+									"type": "Expression"
+								}
+							},
+							"SystemCode": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.systemCode",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_asql_email_addresses",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach Email Address",
+				"description": "Send a message to each email address",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Email Addresses",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Email Addresses').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Send Email",
+							"description": "Send Email Notification",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.00:10:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": "https://prod-01.uksouth.logic.azure.com:443/workflows/1cf057dd7dd448e186baa5a592caaceb/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=bHMmD9pLBxy5uisxB0RaFJX7oEaQz7WURj3Wtn5z0_c",
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"body": {
+									"value": "@json(concat('{\n    \"emailAddress\": \"' ,item().emailAddress, '\",\n    \"subject\": \"ADF Pipeline (PL_data_ingestion_json)\",\n    \"messageBody\": \"Ingestion of Web Store Data into the Data Lake has completed successfully\"\n    }'))",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"systemCode": {
+				"type": "string",
+				"defaultValue": "OWS"
+			},
+			"datasetName": {
+				"type": "string",
+				"defaultValue": "Sales"
+			}
+		},
+		"folder": {
+			"name": "utility"
+		},
+		"annotations": []
+	}
+}
