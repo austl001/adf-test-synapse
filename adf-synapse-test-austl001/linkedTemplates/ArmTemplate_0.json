@@ -1253,126 +1253,158 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"name": "[concat(parameters('factoryName'), '/PL_util_set_status_message')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "Sets the status message from a calling pipeline and constructs a subject and a message",
 				"activities": [
 					{
-						"name": "Data flow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [
-							{
-								"activity": "Copy data1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "1.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "dataflow1",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"source1": {},
-									"sink1": {}
-								}
-							},
-							"staging": {
-								"linkedService": {
-									"referenceName": "AzureDataLakeStorage1",
-									"type": "LinkedServiceReference"
-								},
-								"folderPath": "fsaustl001/dw-staging"
-							},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					},
-					{
-						"name": "Copy data1",
-						"type": "Copy",
+						"name": "Switch Status",
+						"description": "Construct a message and subject depending on the supplied status of either 'success' or 'failed'",
+						"type": "Switch",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "7.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
+							"on": {
+								"value": "@pipeline().parameters.status",
+								"type": "Expression"
 							},
-							"sink": {
-								"type": "DelimitedTextSink",
-								"storeSettings": {
-									"type": "AzureBlobFSWriteSettings"
+							"cases": [
+								{
+									"value": "Success",
+									"activities": [
+										{
+											"name": "Send Email Notifications - Success Message",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "PL_util_send_email_notification",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {
+													"systemCode": {
+														"value": "@pipeline().parameters.systemCode",
+														"type": "Expression"
+													},
+													"datasetName": {
+														"value": "@pipeline().parameters.datasetName",
+														"type": "Expression"
+													},
+													"subject": {
+														"value": "@concat('ADF Pipeline: ', pipeline().parameters.triggeredPipeline)",
+														"type": "Expression"
+													},
+													"message": {
+														"value": "@concat(pipeline().parameters.triggeredPipeline, ' has completed successfully')",
+														"type": "Expression"
+													}
+												}
+											}
+										}
+									]
 								},
-								"formatSettings": {
-									"type": "DelimitedTextWriteSettings",
-									"quoteAllText": true,
-									"fileExtension": ".csv"
+								{
+									"value": "Failed",
+									"activities": [
+										{
+											"name": "Send Email Notifications - Failed Message",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "PL_util_send_email_notification",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {
+													"systemCode": {
+														"value": "@pipeline().parameters.systemCode",
+														"type": "Expression"
+													},
+													"datasetName": {
+														"value": "@pipeline().parameters.datasetName",
+														"type": "Expression"
+													},
+													"subject": {
+														"value": "@concat('ADF Pipeline: ', pipeline().parameters.triggeredPipeline)",
+														"type": "Expression"
+													},
+													"message": {
+														"value": "@concat(pipeline().parameters.triggeredPipeline, ' has FAILED! Please check logs.')",
+														"type": "Expression"
+													}
+												}
+											}
+										}
+									]
 								}
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
+							],
+							"defaultActivities": [
+								{
+									"name": "Send Email Notifications - Default Message",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PL_util_send_email_notification",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"systemCode": {
+												"value": "@pipeline().parameters.systemCode",
+												"type": "Expression"
+											},
+											"datasetName": {
+												"value": "@pipeline().parameters.datasetName",
+												"type": "Expression"
+											},
+											"subject": {
+												"value": "@concat('ADF Pipeline: ', pipeline().parameters.triggeredPipeline)",
+												"type": "Expression"
+											},
+											"message": {
+												"value": "@concat(pipeline().parameters.triggeredPipeline, ' has no valid status: ', pipeline().parameters.status, ' expecting Failed or Success')",
+												"type": "Expression"
+											}
+										}
+									}
 								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "mps_blob_test",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DelimitedText2ADLS",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+							]
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
 				},
+				"parameters": {
+					"status": {
+						"type": "string"
+					},
+					"triggeredPipeline": {
+						"type": "string"
+					},
+					"systemCode": {
+						"type": "string"
+					},
+					"datasetName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "utility"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/dataflow1')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]",
-				"[concat(variables('factoryId'), '/datasets/mps_blob_test')]",
-				"[concat(variables('factoryId'), '/datasets/DelimitedText2ADLS')]"
+				"[concat(variables('factoryId'), '/pipelines/PL_util_send_email_notification')]"
 			]
 		}
 	]
