@@ -785,126 +785,228 @@
 				"description": "Log Pipeline Run information (Metadata)",
 				"activities": [
 					{
-						"name": "Log Pipeline Run Information Metadata",
-						"type": "SqlServerStoredProcedure",
+						"name": "Test Status",
+						"description": "Test the Status \"Success\" or \"Failed\"",
+						"type": "IfCondition",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "0.00:10:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[InsertPipelineLog]",
-							"storedProcedureParameters": {
-								"EndTime": {
-									"value": {
-										"value": "@convertFromUtc(utcnow(), 'GMT Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"PipelineID": {
-									"value": {
-										"value": "@pipeline().parameters.pipelineID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"PipelineName": {
-									"value": {
-										"value": "@pipeline().parameters.pipelineName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().parameters.runID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"SnapshotDate": {
-									"value": {
-										"value": "@pipeline().parameters.snapshotDate",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"SourceToTargetID": {
-									"value": {
-										"value": "@pipeline().parameters.sourceToTargetID",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@pipeline().parameters.pipelineTriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"Status": {
-									"value": {
-										"value": "@pipeline().parameters.status",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"UpdateAt": {
-									"value": {
-										"value": "@convertFromUtc(utcnow(), 'GMT Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_asql_data_engineering_metadata",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Set Status and Send Message",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Log Pipeline Run Information Metadata",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "PL_util_set_status_message",
-								"type": "PipelineReference"
+							"expression": {
+								"value": "@equals(pipeline().parameters.status, 'Success')",
+								"type": "Expression"
 							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"status": {
-									"value": "@pipeline().parameters.status",
-									"type": "Expression"
+							"ifFalseActivities": [
+								{
+									"name": "Log Pipeline Run Information Metadata - Failed",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[InsertPipelineLog]",
+										"storedProcedureParameters": {
+											"EndTime": {
+												"value": {
+													"value": "@convertFromUtc(utcnow(), 'GMT Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"PipelineID": {
+												"value": {
+													"value": "@pipeline().parameters.pipelineID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineName": {
+												"value": {
+													"value": "@pipeline().parameters.pipelineName",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"RunID": {
+												"value": {
+													"value": "@pipeline().parameters.runID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"SnapshotDate": {
+												"value": {
+													"value": "@pipeline().parameters.snapshotDate",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"SourceToTargetID": {
+												"value": {
+													"value": "@pipeline().parameters.sourceToTargetID",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"StartTime": {
+												"value": {
+													"value": "@pipeline().parameters.pipelineTriggerTime",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@pipeline().parameters.status",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"UpdateAt": {
+												"value": {
+													"value": "@convertFromUtc(utcnow(), 'GMT Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_asql_data_engineering_metadata",
+										"type": "LinkedServiceReference"
+									}
 								},
-								"triggeredPipeline": {
-									"value": "@pipeline().parameters.pipelineName",
-									"type": "Expression"
-								},
-								"systemCode": {
-									"value": "@pipeline().parameters.systemCode",
-									"type": "Expression"
-								},
-								"datasetName": {
-									"value": "@pipeline().parameters.datasetName",
-									"type": "Expression"
+								{
+									"name": "Set Status and Send Message",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Log Pipeline Run Information Metadata - Failed",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PL_util_set_status_message",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"status": {
+												"value": "@pipeline().parameters.status",
+												"type": "Expression"
+											},
+											"triggeredPipeline": {
+												"value": "@pipeline().parameters.pipelineName",
+												"type": "Expression"
+											},
+											"systemCode": {
+												"value": "@pipeline().parameters.systemCode",
+												"type": "Expression"
+											},
+											"datasetName": {
+												"value": "@pipeline().parameters.datasetName",
+												"type": "Expression"
+											}
+										}
+									}
 								}
-							}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Log Pipeline Run Information Metadata - Success",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:10:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[InsertPipelineLog]",
+										"storedProcedureParameters": {
+											"EndTime": {
+												"value": {
+													"value": "@convertFromUtc(utcnow(), 'GMT Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"PipelineID": {
+												"value": {
+													"value": "@pipeline().parameters.pipelineID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineName": {
+												"value": {
+													"value": "@pipeline().parameters.pipelineName",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"RunID": {
+												"value": {
+													"value": "@pipeline().parameters.runID",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"SnapshotDate": {
+												"value": {
+													"value": "@pipeline().parameters.snapshotDate",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"SourceToTargetID": {
+												"value": {
+													"value": "@pipeline().parameters.sourceToTargetID",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"StartTime": {
+												"value": {
+													"value": "@pipeline().parameters.pipelineTriggerTime",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@pipeline().parameters.status",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"UpdateAt": {
+												"value": {
+													"value": "@convertFromUtc(utcnow(), 'GMT Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_asql_data_engineering_metadata",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
 						}
 					}
 				],
@@ -1437,7 +1539,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "onlinesales.json",
+						"fileName": "onlinesale.json",
 						"container": "sales"
 					}
 				},
