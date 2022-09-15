@@ -1522,6 +1522,55 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_abls_buyalot_files_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "JSON Source dataset",
+				"linkedServiceName": {
+					"referenceName": "LS_abls_buyalot_webstore_synapseteststorageadf",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"container": {
+						"type": "string"
+					},
+					"directory": {
+						"type": "string"
+					},
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "webstore"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().directory",
+							"type": "Expression"
+						},
+						"container": {
+							"value": "@dataset().container",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_abls_buyalot_webstore_synapseteststorageadf')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_abls_buyalot_webstore')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1539,7 +1588,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "onlinesale.json",
+						"fileName": "onlinesales.json",
 						"container": "sales"
 					}
 				},
