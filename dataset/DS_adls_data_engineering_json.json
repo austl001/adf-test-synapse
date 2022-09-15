@@ -1,5 +1,5 @@
 {
-	"name": "DS_dl_online_sale_json",
+	"name": "DS_adls_data_engineering_json",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorage1",

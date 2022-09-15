@@ -1,9 +1,9 @@
 {
-	"name": "DS_online_sales_json",
+	"name": "DS_abls_buyalot_webstore",
 	"properties": {
 		"description": "DS_online_sales",
 		"linkedServiceName": {
-			"referenceName": "AzureBlobStorage1",
+			"referenceName": "LS_abls_buyalot_webstore_synapseteststorageadf",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
