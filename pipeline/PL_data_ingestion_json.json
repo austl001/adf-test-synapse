@@ -1,5 +1,5 @@
 {
-	"name": "PL_ingest_ws_sales_to_datalake",
+	"name": "PL_data_ingestion_json",
 	"properties": {
 		"description": "Ingest Web Store Online Sales Data into the Data Lake",
 		"activities": [
