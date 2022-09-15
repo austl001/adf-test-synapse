@@ -403,6 +403,30 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_asql_batch_details')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_asql_data_engineering_metadata",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "metadata"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "BatchRun"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_asql_data_engineering_metadata')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_asql_email_addresses')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1023,31 +1047,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/mps_blob_test')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/powerquery1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "WranglingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"name": "DelimitedText1",
-							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> DelimitedText1",
-							"dataset": {
-								"referenceName": "mps_blob_test",
-								"type": "DatasetReference"
-							}
-						}
-					],
-					"script": "section Section1;\r\nshared DelimitedText1 = let AdfDoc = AzureStorage.BlobContents(\"https://synapseteststorageadf.blob.core.windows.net/adf-test-source/MPS_data.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \",\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared UserQuery = let Source = #\"DelimitedText1\",\r\n  #\"Changed column type\" = Table.TransformColumnTypes(Source, {{\"%Tasks Completed On Time\", type number}}),\r\n  #\"Removed columns\" = Table.RemoveColumns(#\"Changed column type\", {\"Time Parameter 1 Performance Charge Value\", \"Additional Time Parameter 2 Performance Charge Value\", \"Additional Time Parameter 3 Performance Charge Value\", \"Additional Time Parameter 4 Performance Charge Value\", \"Total Performance Charge Value\", \"Performance Charge Retailer credited value\", \"Performance Charge MO credited value\", \"Number of tasks completed later than Time Parameter 2\", \"Number of tasks completed later than Time Parameter 3\", \"Number of tasks completed later than Time Parameter 4\", \"Number of tasks completed later than Time Parameter 1\"}),\r\n  #\"Changed column type 1\" = Table.TransformColumnTypes(#\"Removed columns\", {{\"Total number of tasks compeleted within Period\", Int64.Type}, {\"Number of tasks completed on time\", Int64.Type}}) in #\"Changed column type 1\";\r\n",
-					"documentLocale": "en-us"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mps_blob_test')]"
 			]
 		}
 	]
