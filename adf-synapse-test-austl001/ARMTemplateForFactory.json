@@ -622,7 +622,7 @@
 											"Content-Type": "application/json"
 										},
 										"body": {
-											"value": "@json(concat('{\n    \"emailAddress\": \"' ,item().emailAddress, '\",\n    \"subject\": \"ADF Pipeline (PL_data_ingestion_json)\",\n    \"messageBody\": \"Ingestion of Web Store Data into the Data Lake has completed successfully\"\n    }'))",
+											"value": "@json(concat('{\n    \"emailAddress\": \"' ,item().emailAddress, '\",\n    \"subject\": \"',pipeline().parameters.subject,'\",\n    \"messageBody\": \"',pipeline().parameters.message,'\"\n    }'))",
 											"type": "Expression"
 										}
 									}
@@ -643,6 +643,12 @@
 					"datasetName": {
 						"type": "string",
 						"defaultValue": "Sales"
+					},
+					"subject": {
+						"type": "string"
+					},
+					"message": {
+						"type": "string"
 					}
 				},
 				"folder": {
