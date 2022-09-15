@@ -14,7 +14,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "onlinesale.json",
+				"fileName": "onlinesales.json",
 				"container": "sales"
 			}
 		},
