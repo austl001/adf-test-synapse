@@ -1167,6 +1167,101 @@
 							},
 							"firstRowOnly": false
 						}
+					},
+					{
+						"name": "ForEach Batch Run Information",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Batch Run Details",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Batch Run Details').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Run Ingestion",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PL_data_ingestion_json_v6",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"systemCode": {
+												"value": "@variables('v_systemcode')",
+												"type": "Expression"
+											},
+											"datasetName": {
+												"value": "@item().DatasetName",
+												"type": "Expression"
+											},
+											"runid": {
+												"value": "@item().RunID",
+												"type": "Expression"
+											},
+											"snapshotDate": {
+												"value": "@item().SnapshotDate",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Set Batch Status",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "ForEach Batch Run Information",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[SetBatchStatus]",
+							"storedProcedureParameters": {
+								"PFrequency": {
+									"value": {
+										"value": "@variables('v_frequency')",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"PSystemCode": {
+									"value": {
+										"value": "@variables('v_systemcode')",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_asql_data_engineering_metadata",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -1189,7 +1284,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DS_asql_batch_details')]"
+				"[concat(variables('factoryId'), '/datasets/DS_asql_batch_details')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_asql_data_engineering_metadata')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_data_ingestion_json_v6')]"
 			]
 		},
 		{
