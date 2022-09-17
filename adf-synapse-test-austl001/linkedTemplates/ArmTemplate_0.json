@@ -804,6 +804,80 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/PL_orch_daily_batch_run')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Daily Batch Run orchestration of ingestion pipeline",
+				"activities": [
+					{
+						"name": "Get Batch Run Details",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[dbo].[GetBatch]",
+								"storedProcedureParameters": {
+									"PFrequency": {
+										"type": "String",
+										"value": {
+											"value": "@variables('v_frequency')",
+											"type": "Expression"
+										}
+									},
+									"PSystemCode": {
+										"type": "String",
+										"value": {
+											"value": "@variables('v_systemcode')",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_asql_batch_details",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"v_frequency": {
+						"type": "String",
+						"defaultValue": "DAILY"
+					},
+					"v_systemcode": {
+						"type": "String",
+						"defaultValue": "OWS"
+					}
+				},
+				"folder": {
+					"name": "orchestration"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_asql_batch_details')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/PL_util_send_email_notification')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -929,124 +1003,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_asql_email_addresses')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "mps_blob_test",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "AzureSynapseAnalyticsTable1",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "select1"
-						},
-						{
-							"name": "filter1"
-						},
-						{
-							"name": "derivedColumn1"
-						},
-						{
-							"name": "window1"
-						},
-						{
-							"name": "alterRow1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          Standard as string,",
-						"          {Trading.Party.ID} as string,",
-						"          {Trading Party Name} as string,",
-						"          {Trading Party Type} as string,",
-						"          Period as string,",
-						"          {Total number of tasks compeleted within Period} as integer,",
-						"          {Number of tasks completed on time} as short,",
-						"          {Number of tasks completed later than Time Parameter 1} as integer,",
-						"          {Number of tasks completed later than Time Parameter 2} as integer,",
-						"          {Number of tasks completed later than Time Parameter 3} as short,",
-						"          {Number of tasks completed later than Time Parameter 4} as short,",
-						"          {%Tasks Completed On Time} as double,",
-						"          {Time Parameter 1 Performance Charge Value} as integer,",
-						"          {Additional Time Parameter 2 Performance Charge Value} as integer,",
-						"          {Additional Time Parameter 3 Performance Charge Value} as integer,",
-						"          {Additional Time Parameter 4 Performance Charge Value} as integer,",
-						"          {Total Performance Charge Value} as integer,",
-						"          {Performance Charge Retailer credited value} as integer,",
-						"          {Performance Charge MO credited value} as integer",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> source1",
-						"source1 select(mapColumn(",
-						"          Standard,",
-						"          TradingPartyID = {Trading.Party.ID},",
-						"          TradingPartyName = {Trading Party Name},",
-						"          TradingPartyType = {Trading Party Type},",
-						"          Period,",
-						"          TotalTasksCompeleted = {Total number of tasks compeleted within Period},",
-						"          TasksCompletedOnTime = {Number of tasks completed on time},",
-						"          PercentCompletedOnTime = {%Tasks Completed On Time}",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 filter(TotalTasksCompeleted>3) ~> filter1",
-						"filter1 derive(Year = toInteger(left(Period, 4))) ~> derivedColumn1",
-						"derivedColumn1 window(over(Standard,",
-						"          Period),",
-						"     asc(TradingPartyName, true),",
-						"     PercentCompletedOnTimeRank = rank()) ~> window1",
-						"window1 alterRow(upsertIf(true())) ~> alterRow1",
-						"alterRow1 sink(allowSchemaDrift: true,",
-						"     validateSchema: true,",
-						"     input(",
-						"          Standard as string,",
-						"          TradingPartyID as string,",
-						"          TradingPartyName as string,",
-						"          TradingPartyType as string,",
-						"          Period as string,",
-						"          TotalTasksCompeleted as integer,",
-						"          TasksCompletedOnTime as integer,",
-						"          PercentCompletedOnTime as integer,",
-						"          Year as integer",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:false,",
-						"     updateable:false,",
-						"     upsertable:true,",
-						"     keys:['Standard','TradingPartyID','Period'],",
-						"     format: 'table',",
-						"     staged: true,",
-						"     allowCopyCommand: true,",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/mps_blob_test')]",
-				"[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]"
 			]
 		}
 	]
