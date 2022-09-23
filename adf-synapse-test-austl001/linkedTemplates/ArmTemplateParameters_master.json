@@ -20,11 +20,20 @@
 		"LS_abls_buyalot_webstore_synapseteststorageadf_connectionString": {
 			"value": ""
 		},
+		"LS_adls_data_engineering_accountKey": {
+			"value": ""
+		},
 		"LS_asql_data_engineering_metadata_connectionString": {
 			"value": ""
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://datalakeaustl001.dfs.core.windows.net/"
+		},
+		"LS_adls_data_engineering_properties_typeProperties_url": {
+			"value": "https://datalakeaustl001.dfs.core.windows.net/"
+		},
+		"TRG_ingest_uploaded_files_properties_typeProperties_scope": {
+			"value": "/subscriptions/f3d3553c-79f5-40ab-a58e-5bab8aab6bb7/resourceGroups/synapse-rg/providers/Microsoft.Storage/storageAccounts/synapseteststorageadf"
 		},
 		"containerUri": {
 			"value": ""
