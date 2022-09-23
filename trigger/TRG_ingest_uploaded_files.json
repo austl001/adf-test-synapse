@@ -1,0 +1,24 @@
+{
+	"name": "TRG_ingest_uploaded_files",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_data_ingestion_adhoc_csv",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/finance/blobs/",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/f3d3553c-79f5-40ab-a58e-5bab8aab6bb7/resourceGroups/synapse-rg/providers/Microsoft.Storage/storageAccounts/synapseteststorageadf",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
